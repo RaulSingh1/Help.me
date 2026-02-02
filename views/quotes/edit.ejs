@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Quote - Quote Collection</title>
+    <%- include('../partials/styles') %>
+</head>
+<body>
+    <header role="banner">
+        <a href="/" class="logo" aria-label="Quote Collection Home">Quote Collection</a>
+        
+        <nav role="navigation" aria-label="Main navigation">
+            <a href="/">Home</a>
+            <a href="/quotes/search">search</a>
+            <% if (typeof user !== 'undefined' && user) { %>
+                <a href="/quotes/new">add quotes</a>
+            <% } %>
+        </nav>
+        
+        <div class="auth-links" role="navigation" aria-label="User menu">
+            <% if (typeof user !== 'undefined' && user) { %>
+                <span class="user-welcome" aria-live="polite">Welcome, <%= user.username %>!</span>
+                <a href="/auth/logout">Logout</a>
+            <% } else { %>
+                <a href="/auth/login">Login</a>
+                <a href="/auth/register">Register</a>
+            <% } %>
+        </div>
+    </header>
+    
+    <main class="main-content narrow" role="main">
+        <a href="/quotes/<%= quote._id %>" class="back-link">← Back to Quote</a>
+        
+        <div class="form-card">
+            <h1>Edit Quote</h1>
+            
+            <% if (typeof error !== 'undefined' && error) { %>
+                <p class="error" role="alert" aria-live="assertive"><%= error %></p>
+            <% } %>
+            
+            <form action="/quotes/<%= quote._id %>?_method=PUT" method="POST" aria-label="Edit quote form">
+                <label for="text">Quote Text:</label>
+                <textarea id="text" name="text" required aria-required="true"><%= quote.text %></textarea>
+
+                <label for="author">Author:</label>
+                <input type="text" id="author" name="author" value="<%= quote.author %>" required aria-required="true">
+
+                <label for="category">Category:</label>
+                <select id="category" name="category" required aria-required="true">
+                    <option value="inspiration" <%= quote.category === 'inspiration' ? 'selected' : '' %>>Inspiration</option>
+                    <option value="motivation" <%= quote.category === 'motivation' ? 'selected' : '' %>>Motivation</option>
+                    <option value="wisdom" <%= quote.category === 'wisdom' ? 'selected' : '' %>>Wisdom</option>
+                    <option value="humor" <%= quote.category === 'humor' ? 'selected' : '' %>>Humor</option>
+                    <option value="life" <%= quote.category === 'life' ? 'selected' : '' %>>Life</option>
+                    <option value="love" <%= quote.category === 'love' ? 'selected' : '' %>>Love</option>
+                    <option value="success" <%= quote.category === 'success' ? 'selected' : '' %>>Success</option>
+                    <option value="other" <%= quote.category === 'other' ? 'selected' : '' %>>Other</option>
+                </select>
+
+                <button type="submit">Update Quote</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
+

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Quote Collection</title>
+    <%- include('../partials/styles') %>
+</head>
+<body class="auth-page">
+    <header>
+        <a href="/" class="logo">Quote Collection</a>
+        <div class="auth-links">
+            <a href="/auth/login">Login</a>
+            <a href="/auth/register">Register</a>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="auth-card">
+            <h1>Create Account</h1>
+            <p class="subtitle">Join and start sharing quotes</p>
+            
+            <% if (typeof error !== 'undefined' && error) { %>
+                <p class="error"><%= error %></p>
+            <% } %>
+            
+            <form action="/auth/register" method="POST" aria-label="Registration form">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+                
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required autocomplete="new-password">
+                
+                <button type="submit">Register</button>
+            </form>
+            
+            <p class="auth-footer">
+                Already have an account? <a href="/auth/login">Login here</a>
+            </p>
+        </div>
+    </main>
+</body>
+</html>
+

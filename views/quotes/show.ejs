@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Details - Quote Collection</title>
+    <%- include('../partials/styles') %>
+</head>
+<body>
+    <header role="banner">
+        <a href="/" class="logo" aria-label="Quote Collection Home">Quote Collection</a>
+        
+        <nav role="navigation" aria-label="Main navigation">
+            <a href="/">Home</a>
+            <a href="/quotes/search">search</a>
+            <% if (typeof user !== 'undefined' && user) { %>
+                <a href="/quotes/new">add quotes</a>
+            <% } %>
+        </nav>
+        
+        <div class="auth-links" role="navigation" aria-label="User menu">
+            <% if (typeof user !== 'undefined' && user) { %>
+                <span class="user-welcome" aria-live="polite">Welcome, <%= user.username %>!</span>
+                <a href="/auth/logout">Logout</a>
+            <% } else { %>
+                <a href="/auth/login">Login</a>
+                <a href="/auth/register">Register</a>
+            <% } %>
+        </div>
+    </header>
+    
+    <main class="main-content wide" role="main">
+        <a href="/quotes" class="back-link">← Back to All Quotes</a>
+        
+        <article class="quote-card" aria-label="Quote details">
+            <blockquote class="quote-text" aria-label="Quote text"><%= quote.text %></blockquote>
+            
+            <div class="quote-details">
+                <div class="detail-item">
+                    <strong>Author</strong>
+                    <span><%= quote.author %></span>
+                </div>
+                <div class="detail-item">
+                    <strong>Category</strong>
+                    <span><%= quote.category %></span>
+                </div>
+                <div class="detail-item">
+                    <strong>Date Added</strong>
+                    <span><%= quote.dateAdded.toLocaleDateString() %></span>
+                </div>
+                <div class="detail-item">
+                    <strong>Likes</strong>
+                    <span><%= quote.likes || 0 %></span>
+                </div>
+                <% if (quote.user) { %>
+                    <div class="detail-item">
+                        <strong>Added by</strong>
+                        <span><%= quote.user.username %></span>
+                    </div>
+                <% } %>
+            </div>
+            
+            <div class="quote-actions">
+                <% if (typeof user !== 'undefined' && user && quote.user && quote.user._id.toString() === user._id.toString()) { %>
+                    <a href="/quotes/<%= quote._id %>/edit" aria-label="Edit this quote">Edit</a>
+                <% } %>
+                
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <% const isLiked = quote.likedBy && quote.likedBy.some(id => id.toString() === user._id.toString()); %>
+                    <form action="/quotes/<%= quote._id %>/like" method="POST" style="display:inline;">
+                        <button type="submit" class="like-button <%= isLiked ? 'liked' : '' %>" aria-label="<%= isLiked ? 'Unlike this quote' : 'Like this quote' %>">
+                            <%= isLiked ? '♥' : '♡' %> <%= quote.likes || 0 %> Likes
+                        </button>
+                    </form>
+                <% } %>
+            </div>
+        </article>
+    </main>
+</body>
+</html>
+

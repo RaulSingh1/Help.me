@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Quote - Quote Collection</title>
+    <%- include('../partials/styles') %>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">Quote Collection</a>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/quotes/search">search</a>
+            <a href="/quotes">All Quotes</a>
+        </nav>
+        <div class="auth-links">
+            <% if (typeof user !== 'undefined' && user) { %>
+                <span class="user-welcome">Welcome, <%= user.username %>!</span>
+                <a href="/auth/logout">Logout</a>
+            <% } else { %>
+                <a href="/auth/login">Login</a>
+                <a href="/auth/register">Register</a>
+            <% } %>
+        </div>
+    </header>
+    
+    <main class="main-content narrow">
+        <a href="/quotes" class="back-link">← Back to All Quotes</a>
+        
+        <div class="form-card">
+            <h1>Add New Quote</h1>
+            
+            <% if (typeof error !== 'undefined' && error) { %>
+                <p class="error"><%= error %></p>
+            <% } %>
+            
+            <form action="/quotes" method="POST" aria-label="Add new quote form">
+                <label for="text">Quote Text:</label>
+                <textarea id="text" name="text" required placeholder="Enter the quote text..."><%= typeof quote !== 'undefined' ? quote.text : '' %></textarea>
+
+                <label for="author">Author:</label>
+                <input type="text" id="author" name="author" required placeholder="Enter author name" value="<%= typeof quote !== 'undefined' ? quote.author : '' %>">
+
+                <label for="category">Category:</label>
+                <select id="category" name="category" required>
+                    <option value="">Select a category</option>
+                    <option value="inspiration" <%= (typeof quote !== 'undefined' && quote.category === 'inspiration') ? 'selected' : '' %>>Inspiration</option>
+                    <option value="motivation" <%= (typeof quote !== 'undefined' && quote.category === 'motivation') ? 'selected' : '' %>>Motivation</option>
+                    <option value="life" <%= (typeof quote !== 'undefined' && quote.category === 'life') ? 'selected' : '' %>>Life</option>
+                    <option value="love" <%= (typeof quote !== 'undefined' && quote.category === 'love') ? 'selected' : '' %>>Love</option>
+                    <option value="success" <%= (typeof quote !== 'undefined' && quote.category === 'success') ? 'selected' : '' %>>Success</option>
+                    <option value="wisdom" <%= (typeof quote !== 'undefined' && quote.category === 'wisdom') ? 'selected' : '' %>>Wisdom</option>
+                    <option value="humor" <%= (typeof quote !== 'undefined' && quote.category === 'humor') ? 'selected' : '' %>>Humor</option>
+                    <option value="other" <%= (typeof quote !== 'undefined' && quote.category === 'other') ? 'selected' : '' %>>Other</option>
+                </select>
+
+                <button type="submit">Add Quote</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
+
