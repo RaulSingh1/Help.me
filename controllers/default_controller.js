@@ -1,16 +1,13 @@
-const Quote = require('../models/quote-model');
+const HelpTicket = require('../models/help-ticket-model');
 
 const index_render = async (req, res) => {
     try {
-        const count = await Quote.countDocuments();
-        let randomQuote = null;
+        const openTickets = await HelpTicket.countDocuments({ status: 'open' });
+        const inProgressTickets = await HelpTicket.countDocuments({ status: 'in-progress' });
+        const resolvedTickets = await HelpTicket.countDocuments({ status: 'resolved' });
+        const totalTickets = openTickets + inProgressTickets + resolvedTickets;
         
-        if (count > 0) {
-            const randomIndex = Math.floor(Math.random() * count);
-            randomQuote = await Quote.findOne().skip(randomIndex).populate('user', 'username');
-        }
-        
-        res.render("index", { quote: randomQuote, count });
+        res.render("index", { openTickets, inProgressTickets, resolvedTickets, totalTickets });
     } catch (error) {
         res.status(500).send(error.message);
     }

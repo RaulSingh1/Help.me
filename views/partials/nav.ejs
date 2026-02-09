@@ -1,0 +1,16 @@
+<nav>
+    <a href="/">Hjem</a>
+    <a href="/tickets">Saker</a>
+    <% if (user) { %>
+        <a href="/tickets/new">Ny sak</a>
+        <% if (user.isAdmin) { %>
+            <a href="/tickets">Admin: Løs saker</a>
+        <% } %>
+        <a href="/auth/user">Min profil</a>
+        <a href="/auth/logout">Logg ut</a>
+    <% } else { %>
+        <a href="/auth/login">Logg inn</a>
+        <a href="/auth/register">Registrer</a>
+    <% } %>
+</nav>
+
