@@ -1,0 +1,58 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Details - Help Desk</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <%- include('../partials/nav') %>
+
+    <div class="container">
+        <h1>Ticket Details</h1>
+
+        <div class="ticket-detail">
+            <h2><%= ticket.title %></h2>
+            
+            <div class="ticket-info">
+                <p><strong>Priority:</strong> <%= ticket.priority %></p>
+                <p><strong>Status:</strong> 
+                    <% if (ticket.status === 'resolved') { %>
+                        <span class="status-resolved"><%= ticket.status %></span>
+                    <% } else { %>
+                        <%= ticket.status %>
+                    <% } %>
+                </p>
+                <p><strong>Created By:</strong> <%= ticket.user ? ticket.user.username : 'Unknown' %></p>
+                <p><strong>Date Created:</strong> <%= ticket.dateCreated ? ticket.dateCreated.toLocaleDateString() : 'Unknown' %></p>
+                <% if (ticket.resolvedBy) { %>
+                    <p><strong>Resolved By:</strong> Admin</p>
+                    <p><strong>Resolved At:</strong> <%= ticket.resolvedAt ? ticket.resolvedAt.toLocaleDateString() : 'Unknown' %></p>
+                <% } %>
+            </div>
+
+            <div class="ticket-description">
+                <h3>Description</h3>
+                <p><%= ticket.description %></p>
+            </div>
+
+            <div class="ticket-actions">
+                <a href="/tickets" class="btn">Back to All Tickets</a>
+                <% if (user && ticket.user && ticket.user._id.toString() === user._id.toString()) { %>
+                    <a href="/tickets/<%= ticket._id %>/edit" class="btn">Edit</a>
+                    <form action="/tickets/<%= ticket._id %>?_method=DELETE" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this ticket?')">Delete</button>
+                    </form>
+                <% } %>
+                <% if (user && user.isAdmin && ticket.status !== 'resolved') { %>
+                    <form action="/tickets/<%= ticket._id %>/resolve" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to resolve this ticket?')">Resolve Ticket</button>
+                    </form>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

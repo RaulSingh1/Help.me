@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Min profil - Help Desk</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <nav>
+        <a href="/">Hjem</a>
+        <a href="/tickets">Saker</a>
+        <a href="/auth/user">Min profil</a>
+        <a href="/auth/logout">Logg ut</a>
+    </nav>
+
+    <div class="container">
+        <h1>Min profil</h1>
+        
+        <div class="user-info">
+            <div class="info-card">
+                <h3>Brukerinformasjon</h3>
+                <p><strong>Brukernavn:</strong> <%= user.username %></p>
+                <p><strong>Antall saker opprettet:</strong> <%= ticketCount %></p>
+                <p><strong>Bli med:</strong> <%= user.createdAt ? user.createdAt.toLocaleDateString('no-NO') : 'Ukjent' %></p>
+            </div>
+        
+        <div class="danger-zone">
+            <h3>Fare-sone</h3>
+            <p>Advarsel: Denne handlingen kan ikke angres.</p>
+            <form action="/auth/user/delete" method="POST" onsubmit="return confirm('Er du sikker på at du vil slette kontoen din? Alle dine saker vil også bli slettet.');">
+                <button type="submit" class="btn btn-danger">Slett konto</button>
+            </form>
+        </div>
+</body>
+</html>

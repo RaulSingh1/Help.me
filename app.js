@@ -8,11 +8,10 @@ const app = express();
 const path = require("path")
 
 const default_routes = require("./router/default_routes.js");
-const quote_routes = require("./router/quotes_routes.js");
 const auth_routes = require("./router/auth_routes.js");
 const authController = require("./controllers/authController.js");
 
-mongoose.connect("mongodb://10.12.2.181:27017/quotes", {
+mongoose.connect("mongodb://10.12.19.181:27017/helpdesk", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
@@ -45,10 +44,10 @@ app.use(session({
 // Pass user to all views
 app.use(authController.passUserToView);
 
+// Register routes
+app.use(default_routes);
+app.use('/auth', auth_routes);
+
 app.listen(3000, ()=>{
     console.info("Successfully running the server");
 });
-
-app.use(default_routes);
-app.use('/auth', auth_routes);
-app.use('/quotes', quote_routes);

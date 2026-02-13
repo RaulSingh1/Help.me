@@ -1,5 +1,4 @@
 const User = require('../models/user-model');
-const HelpTicket = require('../models/help-ticket-model');
 
 // Register page
 exports.registerPage = (req, res) => {
@@ -23,7 +22,6 @@ exports.register = async (req, res) => {
     // Log in the user after registration
     req.session.userId = user._id;
     req.session.username = user.username;
-    req.session.isAdmin = user.isAdmin;
     
     res.redirect('/tickets');
   } catch (error) {
@@ -54,7 +52,6 @@ exports.login = async (req, res) => {
     // Set session
     req.session.userId = user._id;
     req.session.username = user.username;
-    req.session.isAdmin = user.isAdmin;
     
     res.redirect('/tickets');
   } catch (error) {
@@ -73,49 +70,6 @@ exports.logout = (req, res) => {
   });
 };
 
-// User profile page
-exports.userPage = async (req, res) => {
-  try {
-    const user = await User.findById(req.session.userId);
-    if (!user) {
-      return res.redirect('/auth/login');
-    }
-    
-    const ticketCount = await HelpTicket.countDocuments({ user: req.session.userId });
-    
-    res.render('auth/user', { user, ticketCount });
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-};
-
-// Delete user account
-exports.deleteUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.session.userId);
-    if (!user) {
-      return res.redirect('/auth/login');
-    }
-    
-    // Delete all tickets created by this user
-    await HelpTicket.deleteMany({ user: req.session.userId });
-    
-    // Delete the user
-    await User.findByIdAndDelete(req.session.userId);
-    
-    // Destroy session
-    req.session.destroy((err) => {
-      if (err) {
-        return res.redirect('/');
-      }
-      res.clearCookie('connect.sid');
-      res.redirect('/');
-    });
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-};
-
 // Middleware to check if user is authenticated
 exports.isAuthenticated = (req, res, next) => {
   if (req.session.userId) {
@@ -128,8 +82,8 @@ exports.isAuthenticated = (req, res, next) => {
 exports.passUserToView = (req, res, next) => {
   res.locals.user = req.session.userId ? {
     _id: req.session.userId,
-    username: req.session.username,
-    isAdmin: req.session.isAdmin || false
+    username: req.session.username
   } : null;
   next();
 };
+

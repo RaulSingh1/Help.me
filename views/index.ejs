@@ -3,76 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quote Collection - Daily Inspiration</title>
-    <%- include('partials/styles') %>
+    <title>Help Desk - Home</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <header role="banner">
-        <a href="/" class="logo" aria-label="Quote Collection Home">Quote Collection</a>
+    <%- include('partials/nav') %>
+
+    <div class="container">
+        <h1>Help Desk</h1>
         
-        <nav role="navigation" aria-label="Main navigation">
-            <a href="/">Home</a>
-            <a href="/quotes/search">search</a>
-            <% if (typeof user !== 'undefined' && user) { %>
-                <a href="/quotes/new">add quotes</a>
-            <% } %>
-        </nav>
-        
-        <div class="auth-links" role="navigation" aria-label="User menu">
-            <% if (typeof user !== 'undefined' && user) { %>
-                <span class="user-welcome" aria-live="polite">Welcome, <%= user.username %>!</span>
-                <a href="/auth/logout">Logout</a>
-            <% } else { %>
-                <a href="/auth/login">Login</a>
-                <a href="/auth/register">Register</a>
-            <% } %>
-        </div>
-    </header>
-    
-    <main class="main-content content-center" role="main">
-        <h1 class="hero-title">Discover Inspiration</h1>
-        <p class="hero-subtitle">A random quote curated just for you</p>
-        
-        <% if (typeof quote !== 'undefined' && quote) { %>
-            <article class="quote-showcase" aria-labelledby="quote-text">
-                <span class="featured-label">Featured Quote</span>
-                
-                <blockquote class="quote-text" id="quote-text"><%= quote.text %></blockquote>
-                
-                <p class="quote-author">
-                    <strong>— <%= quote.author %></strong>
-                    <% if (quote.user) { %>
-                        <br><span class="quote-count">Added by <%= quote.user.username %></span>
-                    <% } %>
-                </p>
-                
-                <div class="quote-actions">
-                    <% if (typeof user !== 'undefined' && user) { %>
-                        <% const isLiked = quote.likedBy && quote.likedBy.some(id => id.toString() === user._id.toString()); %>
-                        <form action="/quotes/<%= quote._id %>/like" method="POST">
-                            <button type="submit" class="like-button <%= isLiked ? 'liked' : '' %>" aria-label="<%= isLiked ? 'Unlike this quote' : 'Like this quote - Currently has ' + (quote.likes || 0) + ' likes' %>">
-                                <%= isLiked ? '♥' : '♡' %> <%= quote.likes || 0 %> Likes
-                            </button>
-                        </form>
-                    <% } else { %>
-                        <span class="quote-count"><%= quote.likes || 0 %> Likes</span>
-                    <% } %>
-                    
-                    <a href="/quotes/<%= quote._id %>" aria-label="View full details of this quote">View Details →</a>
-                </div>
-            </article>
-        <% } else { %>
-            <div class="empty-state" role="status">
-                <h2>No Quotes Yet</h2>
-                <p>Be the first to add a quote and inspire others!</p>
-                <% if (typeof user !== 'undefined' && user) { %>
-                    <a href="/quotes/new" class="btn">Add the First Quote</a>
-                <% } else { %>
-                    <a href="/auth/register" class="btn">Register</a> or <a href="/auth/login">Login</a> to add quotes
-                <% } %>
+        <div class="ticket-stats">
+            <div class="stat-card">
+                <h3>Open Tickets</h3>
+                <p class="stat-number"><%= openTickets %></p>
             </div>
-        <% } %>
-    </main>
+            <div class="stat-card">
+                <h3>In Progress</h3>
+                <p class="stat-number"><%= inProgressTickets %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Resolved</h3>
+                <p class="stat-number"><%= resolvedTickets %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Tickets</h3>
+                <p class="stat-number"><%= totalTickets %></p>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <a href="/tickets/new" class="btn">Submit New Ticket</a>
+            <a href="/tickets" class="btn">View All Tickets</a>
+        </div>
+    </div>
 </body>
 </html>
 
