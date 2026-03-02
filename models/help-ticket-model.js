@@ -16,8 +16,9 @@ const helpTicketSchema = new mongoose.Schema({
   dateCreated: { type: Date, default: Date.now },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   resolvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
-  resolvedAt: { type: Date, default: null }
+  resolvedAt: { type: Date, default: null },
+  deletedAt: { type: Date, default: null },
+  deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null }
 }, { collection: 'help_tickets' });
 
 module.exports = mongoose.model('HelpTicket', helpTicketSchema);
-

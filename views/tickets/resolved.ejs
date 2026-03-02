@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Tickets - Help Desk</title>
+    <title>Resolved Tickets - Help Desk</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -12,28 +12,26 @@
     <div class="container">
         <% const canSeeDeletedContent = user && user.isAdmin && showDeleted; %>
 
-        <h1>All Help Tickets</h1>
+        <h1>Resolved Tickets</h1>
 
         <div class="actions">
-            <a href="/tickets/new" class="btn">Submit New Ticket</a>
+            <a href="/tickets<%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>" class="btn">View Open Tickets</a>
             <a href="/tickets/search<%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>" class="btn">Search Tickets</a>
-            <a href="/tickets/resolved<%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>" class="btn">View Resolved Tickets</a>
             <% if (user && user.isAdmin) { %>
-                <a href="/tickets?showDeleted=<%= showDeleted ? '0' : '1' %>" class="btn btn-secondary"><%= showDeleted ? 'Skjul slettet' : 'Vis slettet' %></a>
+                <a href="/tickets/resolved?showDeleted=<%= showDeleted ? '0' : '1' %>" class="btn btn-secondary"><%= showDeleted ? 'Skjul slettet' : 'Vis slettet' %></a>
             <% } %>
         </div>
 
         <% if (tickets.length === 0) { %>
-            <p>No tickets submitted yet.</p>
+            <p>No resolved tickets.</p>
         <% } else { %>
             <table>
                 <thead>
                     <tr>
                         <th>Title</th>
                         <th>Priority</th>
-                        <th>Status</th>
                         <th>Created By</th>
-                        <th>Date</th>
+                        <th>Resolved Date</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -44,9 +42,8 @@
                         <tr class="<%= isDeletedTicket ? 'row-deleted' : '' %>">
                             <td><%= hideDeletedContent ? '[deleted ticket]' : ticket.title %></td>
                             <td><%= hideDeletedContent ? '[deleted]' : ticket.priority %></td>
-                            <td><%= isDeletedTicket ? 'deleted' : ticket.status %></td>
                             <td><%= hideDeletedContent ? '[deleted]' : (ticket.user ? ticket.user.username : 'Unknown') %></td>
-                            <td><%= hideDeletedContent ? '[deleted]' : (ticket.dateCreated ? ticket.dateCreated.toLocaleDateString() : 'Unknown') %></td>
+                            <td><%= hideDeletedContent ? '[deleted]' : (ticket.resolvedAt ? ticket.resolvedAt.toLocaleDateString() : 'Unknown') %></td>
                             <td>
                                 <a href="/tickets/<%= ticket._id %><%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>">View</a>
                             </td>

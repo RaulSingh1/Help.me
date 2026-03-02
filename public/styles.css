@@ -104,6 +104,11 @@ nav a:hover {
     font-weight: bold;
 }
 
+.status-deleted {
+    color: #7f8c8d;
+    font-weight: bold;
+}
+
 /* Forms */
 .form-group {
     margin-bottom: 1rem;
@@ -198,12 +203,34 @@ tbody tr:hover {
     background: #f9f9f9;
 }
 
+.row-deleted {
+    background: #f7f7f7;
+}
+
+.row-deleted td {
+    color: #7a7a7a;
+}
+
 /* Ticket Detail */
 .ticket-detail {
     background: #fff;
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.ticket-deleted {
+    background: #f7f7f7;
+    border: 1px dashed #bcbcbc;
+}
+
+.deleted-note {
+    background: #efefef;
+    color: #555;
+    border-left: 4px solid #8d8d8d;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
 }
 
 .ticket-info {
@@ -287,3 +314,199 @@ tbody tr:hover {
     }
 }
 
+/* Comments Section */
+.comments-section {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 2rem;
+}
+
+.comments-section h3 {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #eee;
+}
+
+.no-comments {
+    color: #7f8c8d;
+    font-style: italic;
+    text-align: center;
+    padding: 2rem;
+}
+
+.comments-list {
+    margin-bottom: 2rem;
+}
+
+/* Comment with voting */
+.comment {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: #fafafa;
+}
+
+.comment:last-child {
+    margin-bottom: 0;
+}
+
+.comment-voting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 40px;
+    gap: 0.25rem;
+}
+
+.vote-form {
+    margin: 0;
+    padding: 0;
+}
+
+.vote-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #999;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.vote-btn:hover:not(:disabled) {
+    background: #eee;
+    color: #555;
+}
+
+.vote-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.vote-btn:not(:disabled):hover {
+    transform: scale(1.1);
+}
+
+.vote-btn.upvote.active {
+    color: #27ae60;
+}
+
+.vote-btn.downvote.active {
+    color: #e74c3c;
+}
+
+.vote-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.vote-score {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.vote-score.positive {
+    color: #27ae60;
+}
+
+.vote-score.negative {
+    color: #e74c3c;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+/* Comment author styling */
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.admin-author {
+    color: #e74c3c !important;
+}
+
+.admin-badge {
+    font-size: 0.75rem;
+    color: #e74c3c;
+    margin-left: 0.5rem;
+    font-weight: 500;
+}
+
+.deleted-badge {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+    margin-left: 0.5rem;
+    font-weight: 500;
+}
+
+.comment-date {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+.comment-text {
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Deleted comment styling */
+.comment-deleted {
+    background: #f5f5f5;
+    opacity: 0.7;
+}
+
+.comment-deleted .comment-text {
+    color: #999;
+    font-style: italic;
+}
+
+.comment-actions {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed #ddd;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+/* Comment form */
+.comment-form {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #eee;
+}
+
+.comment-form h4 {
+    margin-bottom: 1rem;
+}
+
+.comment-form textarea {
+    min-height: 100px;
+}
+
+.login-prompt {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    text-align: center;
+    color: #7f8c8d;
+}

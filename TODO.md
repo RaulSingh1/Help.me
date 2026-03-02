@@ -1,25 +1,24 @@
-# Todo List - Admin User "superpadde" Implementation
+# Todo List - Ticket Comment System
 
-## Phase 1: Update User Model
-- [x] Add `isAdmin` field to user model
+## Phase 1: Create Comment Model
+- [x] Create `models/comment-model.js` for comments
 
-## Phase 2: Create Seed Script for Admin User
-- [x] Create `scripts/create-admin.js` to create superpadde user
+## Phase 2: Create Comment Controller
+- [x] Create `controllers/commentController.js` for handling comments
 
-## Phase 3: Update Ticket Model
-- [x] Add `resolvedBy` and `resolvedAt` fields to ticket model
+## Phase 3: Create Comment Routes
+- [x] Create `router/comments_routes.js`
 
-## Phase 4: Update Ticket Views
-- [x] Show resolve button for admin users
-- [x] Show ticket status with resolution info
+## Phase 4: Update Ticket Show View
+- [x] Display comments with author info
+- [x] Admin usernames in red color
 
-## Phase 5: Update Navigation
-- [x] Add admin panel link for admin users
+## Phase 5: Add Comment Form
+- [x] Allow logged-in users to add comments
 
-## Phase 6: Create Admin User
-- [x] Run `node scripts/create-admin.js` ✓ Created!
+## Phase 6: Update Styles
+- [x] CSS for admin username (red color)
 
 ## Phase 7: Testing
-- [ ] Test admin functionality
-- [ ] Test regular user functionality
+- [ ] Test commenting functionality
 

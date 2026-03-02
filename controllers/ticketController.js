@@ -1,10 +1,15 @@
 const HelpTicket = require('../models/help-ticket-model');
-const authController = require('./authController');
+
+const getShowDeletedState = (req) => {
+  const showDeleted = Boolean(req.session && req.session.isAdmin && req.query.showDeleted === '1');
+  return { showDeleted };
+};
 
 exports.index = async (req, res) => {
   try {
-    const tickets = await HelpTicket.find().populate('user', 'username');
-    res.render('tickets/index', { tickets });
+    const { showDeleted } = getShowDeletedState(req);
+    const tickets = await HelpTicket.find({ status: { $nin: ['resolved', 'closed'] } }).populate('user', 'username');
+    res.render('tickets/index', { tickets, showDeleted });
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -12,9 +17,18 @@ exports.index = async (req, res) => {
 
 exports.show = async (req, res) => {
   try {
+    const { showDeleted } = getShowDeletedState(req);
     const ticket = await HelpTicket.findById(req.params.id).populate('user', 'username');
     if (!ticket) return res.status(404).send('Ticket not found');
-    res.render('tickets/show', { ticket });
+    
+    // Get comments for this ticket with populated upvotes/downvotes
+    const comments = await require('../models/comment-model').find({ ticket: req.params.id })
+      .populate('user', 'username isAdmin')
+      .populate('upvotes', 'username')
+      .populate('downvotes', 'username')
+      .sort({ createdAt: -1 });
+    
+    res.render('tickets/show', { ticket, comments, showDeleted });
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -53,6 +67,7 @@ exports.edit = async (req, res) => {
   try {
     const ticket = await HelpTicket.findById(req.params.id);
     if (!ticket) return res.status(404).send('Ticket not found');
+    if (ticket.deletedAt) return res.status(400).send('Deleted tickets cannot be edited');
     
     // Check if user owns this ticket
     if (ticket.user.toString() !== req.session.userId) {
@@ -72,6 +87,7 @@ exports.update = async (req, res) => {
   try {
     const ticket = await HelpTicket.findById(req.params.id);
     if (!ticket) return res.status(404).send('Ticket not found');
+    if (ticket.deletedAt) return res.status(400).send('Deleted tickets cannot be edited');
     
     // Check if user owns this ticket
     if (ticket.user.toString() !== req.session.userId) {
@@ -92,16 +108,26 @@ exports.delete = async (req, res) => {
     return res.redirect('/auth/login');
   }
   try {
+    const { showDeleted } = getShowDeletedState(req);
     const ticket = await HelpTicket.findById(req.params.id);
     if (!ticket) return res.status(404).send('Ticket not found');
     
-    // Check if user owns this ticket
-    if (ticket.user.toString() !== req.session.userId) {
-      return res.status(403).send('You can only delete your own tickets');
+    // Check if user owns this ticket or is admin
+    const isOwner = ticket.user.toString() === req.session.userId;
+    const isAdmin = Boolean(req.session.isAdmin);
+    if (!isOwner && !isAdmin) {
+      return res.status(403).send('You are not authorized to delete this ticket');
+    }
+
+    if (ticket.deletedAt) {
+      return res.redirect(`/tickets/${req.params.id}`);
     }
     
-    await HelpTicket.findByIdAndDelete(req.params.id);
-    res.redirect('/tickets');
+    ticket.deletedAt = new Date();
+    ticket.deletedBy = req.session.userId;
+    await ticket.save();
+
+    res.redirect(`/tickets${showDeleted ? '?showDeleted=1' : ''}`);
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -109,7 +135,11 @@ exports.delete = async (req, res) => {
 
 exports.search = async (req, res) => {
   try {
+    const { showDeleted } = getShowDeletedState(req);
     const query = req.query.q;
+    if (!query) {
+      return res.render('tickets/search', { tickets: [], query: undefined, showDeleted });
+    }
     
     // First, find users matching the query
     const User = require('../models/user-model');
@@ -125,7 +155,7 @@ exports.search = async (req, res) => {
       ]
     }).populate('user', 'username');
     
-    res.render('tickets/search', { tickets, query });
+    res.render('tickets/search', { tickets, query, showDeleted });
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -138,8 +168,10 @@ exports.resolve = async (req, res) => {
   }
   
   try {
+    const { showDeleted } = getShowDeletedState(req);
     const ticket = await HelpTicket.findById(req.params.id);
     if (!ticket) return res.status(404).send('Ticket not found');
+    if (ticket.deletedAt) return res.status(400).send('Deleted tickets cannot be resolved');
     
     // Update ticket to resolved
     ticket.status = 'resolved';
@@ -147,9 +179,19 @@ exports.resolve = async (req, res) => {
     ticket.resolvedAt = new Date();
     
     await ticket.save();
-    res.redirect('/tickets');
+    res.redirect(`/tickets${showDeleted ? '?showDeleted=1' : ''}`);
   } catch (error) {
     res.status(500).send(error.message);
   }
 };
 
+// Show resolved tickets
+exports.resolved = async (req, res) => {
+  try {
+    const { showDeleted } = getShowDeletedState(req);
+    const tickets = await HelpTicket.find({ status: { $in: ['resolved', 'closed'] } }).populate('user', 'username');
+    res.render('tickets/resolved', { tickets, showDeleted });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
