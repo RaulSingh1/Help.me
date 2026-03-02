@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -52,7 +52,128 @@
                 <% } %>
             </div>
         </div>
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h3>Comments (<%= comments.length %>)</h3>
+            
+            <% if (comments.length === 0) { %>
+                <p class="no-comments">No comments yet. Be the first to comment!</p>
+            <% } else { %>
+                <div class="comments-list">
+                    <% comments.forEach(comment => { 
+                        const upvoteCount = comment.upvotes ? comment.upvotes.length : 0;
+                        const downvoteCount = comment.downvotes ? comment.downvotes.length : 0;
+                        const score = upvoteCount - downvoteCount;
+                        
+                        // Check if current user has upvoted/downvoted
+                        let hasUpvoted = false;
+                        let hasDownvoted = false;
+                        if (user && comment.upvotes) {
+                            hasUpvoted = comment.upvotes.some(id => (typeof id === 'object' ? id._id : id).toString() === user._id.toString());
+                        }
+                        if (user && comment.downvotes) {
+                            hasDownvoted = comment.downvotes.some(id => (typeof id === 'object' ? id._id : id).toString() === user._id.toString());
+                        }
+                    %>
+                        <div class="comment <%= comment.deletedAt ? 'comment-deleted' : '' %>" id="comment-<%= comment._id %>">
+                            <div class="comment-voting">
+                                <button type="button" class="vote-btn upvote <%= hasUpvoted ? 'active' : '' %>" 
+                                    onclick="vote('<%= comment._id %>', 'up')"
+                                    <%= !user || comment.deletedAt ? 'disabled' : '' %>
+                                    title="Upvote">▲</button>
+                                <span class="vote-score <%= score > 0 ? 'positive' : (score < 0 ? 'negative' : '') %>" id="score-<%= comment._id %>"><%= score %></span>
+                                <button type="button" class="vote-btn downvote <%= hasDownvoted ? 'active' : '' %>" 
+                                    onclick="vote('<%= comment._id %>', 'down')"
+                                    <%= !user || comment.deletedAt ? 'disabled' : '' %>
+                                    title="Downvote">▼</button>
+                            </div>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <span class="comment-author <%= comment.user && comment.user.isAdmin && !comment.deletedAt ? 'admin-author' : '' %>">
+                                        <%= comment.deletedAt ? '[deleted]' : (comment.user ? comment.user.username : 'Unknown') %>
+                                        <% if (comment.user && comment.user.isAdmin && !comment.deletedAt) { %>
+                                            <span class="admin-badge">(Admin)</span>
+                                        <% } %>
+                                    </span>
+                                    <span class="comment-date">
+                                        <%= comment.createdAt ? comment.createdAt.toLocaleDateString() + ' ' + comment.createdAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Unknown' %>
+                                    </span>
+                                </div>
+                                <div class="comment-text">
+                                    <%= comment.deletedAt ? '[deleted]' : comment.text %>
+                                </div>
+                                <% if (!comment.deletedAt && user && (comment.user && comment.user._id.toString() === user._id.toString() || user.isAdmin)) { %>
+                                    <div class="comment-actions">
+                                        <form action="/tickets/<%= ticket._id %>/comments/<%= comment._id %>/delete" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this comment?')">Delete</button>
+                                        </form>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
+
+            <!-- Comment Form -->
+            <% if (user) { %>
+                <div class="comment-form">
+                    <h4>Add a Comment</h4>
+                    <form action="/tickets/<%= ticket._id %>/comments" method="POST">
+                        <div class="form-group">
+                            <textarea name="text" rows="4" placeholder="Write your comment here..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn">Submit Comment</button>
+                    </form>
+                </div>
+            <% } else { %>
+                <div class="login-prompt">
+                    <p><a href="/auth/login">Log in</a> to leave a comment.</p>
+                </div>
+            <% } %>
+        </div>
     </div>
+
+    <script>
+    async function vote(commentId, type) {
+        try {
+            console.log('Voting:', commentId, type);
+            
+            const response = await fetch(`/comments/${commentId}/${type === 'up' ? 'upvote' : 'downvote'}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            console.log('Response status:', response.status);
+            
+            const data = await response.json();
+            console.log('Response data:', data);
+            
+            if (data.success) {
+                // Update score
+                const scoreEl = document.getElementById(`score-${commentId}`);
+                scoreEl.textContent = data.score;
+                scoreEl.className = `vote-score ${data.score > 0 ? 'positive' : (data.score < 0 ? 'negative' : '')}`;
+                
+                // Update button states
+                const commentEl = document.getElementById(`comment-${commentId}`);
+                const upvoteBtn = commentEl.querySelector('.upvote');
+                const downvoteBtn = commentEl.querySelector('.downvote');
+                
+                upvoteBtn.classList.toggle('active', data.hasUpvoted);
+                downvoteBtn.classList.toggle('active', data.hasDownvoted);
+            } else if (data.error) {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Vote error:', error);
+            alert('Vote failed: ' + error.message);
+        }
+    }
+    </script>
 </body>
 </html>
-

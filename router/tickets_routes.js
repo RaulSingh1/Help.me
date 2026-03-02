@@ -3,6 +3,7 @@ const router = express.Router();
 const ticketController = require('../controllers/ticketController');
 
 router.get('/', ticketController.index);
+router.get('/resolved', ticketController.resolved);
 router.get('/new', ticketController.new);
 router.post('/', ticketController.create);
 router.get('/search', ticketController.search);

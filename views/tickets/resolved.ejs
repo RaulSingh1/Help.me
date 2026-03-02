@@ -3,32 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Tickets - Help Desk</title>
+    <title>Resolved Tickets - Help Desk</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <%- include('../partials/nav') %>
 
     <div class="container">
-        <h1>All Help Tickets</h1>
+        <h1>Resolved Tickets</h1>
         
         <div class="actions">
-            <a href="/tickets/new" class="btn">Submit New Ticket</a>
+            <a href="/tickets" class="btn">View Open Tickets</a>
             <a href="/tickets/search" class="btn">Search Tickets</a>
-            <a href="/tickets/resolved" class="btn">View Resolved Tickets</a>
         </div>
 
         <% if (tickets.length === 0) { %>
-            <p>No tickets submitted yet.</p>
+            <p>No resolved tickets.</p>
         <% } else { %>
             <table>
                 <thead>
                     <tr>
                         <th>Title</th>
                         <th>Priority</th>
-                        <th>Status</th>
                         <th>Created By</th>
-                        <th>Date</th>
+                        <th>Resolved Date</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -37,9 +35,8 @@
                         <tr>
                             <td><%= ticket.title %></td>
                             <td><%= ticket.priority %></td>
-                            <td><%= ticket.status %></td>
                             <td><%= ticket.user ? ticket.user.username : 'Unknown' %></td>
-                            <td><%= ticket.dateCreated ? ticket.dateCreated.toLocaleDateString() : 'Unknown' %></td>
+                            <td><%= ticket.resolvedAt ? ticket.resolvedAt.toLocaleDateString() : 'Unknown' %></td>
                             <td>
                                 <a href="/tickets/<%= ticket._id %>">View</a>
                             </td>

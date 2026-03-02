@@ -1,9 +1,10 @@
 const HelpTicket = require('../models/help-ticket-model');
 const authController = require('./authController');
+const commentController = require('./commentController');
 
 exports.index = async (req, res) => {
   try {
-    const tickets = await HelpTicket.find().populate('user', 'username');
+    const tickets = await HelpTicket.find({ status: { $nin: ['resolved', 'closed'] } }).populate('user', 'username');
     res.render('tickets/index', { tickets });
   } catch (error) {
     res.status(500).send(error.message);
@@ -14,7 +15,15 @@ exports.show = async (req, res) => {
   try {
     const ticket = await HelpTicket.findById(req.params.id).populate('user', 'username');
     if (!ticket) return res.status(404).send('Ticket not found');
-    res.render('tickets/show', { ticket });
+    
+    // Get comments for this ticket with populated upvotes/downvotes
+    const comments = await require('../models/comment-model').find({ ticket: req.params.id })
+      .populate('user', 'username isAdmin')
+      .populate('upvotes', 'username')
+      .populate('downvotes', 'username')
+      .sort({ createdAt: -1 });
+    
+    res.render('tickets/show', { ticket, comments });
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -148,6 +157,16 @@ exports.resolve = async (req, res) => {
     
     await ticket.save();
     res.redirect('/tickets');
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+// Show resolved tickets
+exports.resolved = async (req, res) => {
+  try {
+    const tickets = await HelpTicket.find({ status: { $in: ['resolved', 'closed'] } }).populate('user', 'username');
+    res.render('tickets/resolved', { tickets });
   } catch (error) {
     res.status(500).send(error.message);
   }
