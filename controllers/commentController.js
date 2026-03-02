@@ -1,6 +1,11 @@
 const Comment = require('../models/comment-model');
 const HelpTicket = require('../models/help-ticket-model');
 
+const showDeletedQuerySuffix = (req) => {
+  const showDeleted = Boolean(req.session && req.session.isAdmin && req.body.showDeleted === '1');
+  return showDeleted ? '?showDeleted=1' : '';
+};
+
 // Add a comment to a ticket
 exports.addComment = async (req, res) => {
   if (!req.session.userId) {
@@ -15,6 +20,9 @@ exports.addComment = async (req, res) => {
     const ticket = await HelpTicket.findById(ticketId);
     if (!ticket) {
       return res.status(404).send('Ticket not found');
+    }
+    if (ticket.deletedAt) {
+      return res.status(403).send('Cannot add comments to a deleted ticket');
     }
     
     // Create comment
@@ -32,7 +40,7 @@ exports.addComment = async (req, res) => {
       await ticket.save();
     }
     
-    res.redirect(`/tickets/${ticketId}`);
+    res.redirect(`/tickets/${ticketId}${showDeletedQuerySuffix(req)}`);
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -65,7 +73,7 @@ exports.deleteComment = async (req, res) => {
     comment.deletedAt = new Date();
     await comment.save();
     
-    res.redirect(`/tickets/${ticketId}`);
+    res.redirect(`/tickets/${ticketId}${showDeletedQuerySuffix(req)}`);
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -93,6 +101,13 @@ exports.upvoteComment = async (req, res) => {
     const comment = await Comment.findById(commentId);
     if (!comment) {
       return res.status(404).json({ error: 'Comment not found' });
+    }
+    if (comment.deletedAt) {
+      return res.status(400).json({ error: 'Cannot vote on deleted comments' });
+    }
+    const ticket = await HelpTicket.findById(comment.ticket).select('deletedAt');
+    if (ticket && ticket.deletedAt) {
+      return res.status(400).json({ error: 'Cannot vote on comments in deleted tickets' });
     }
     
     console.log('Before - upvotes:', comment.upvotes, 'downvotes:', comment.downvotes);
@@ -153,6 +168,13 @@ exports.downvoteComment = async (req, res) => {
     if (!comment) {
       return res.status(404).json({ error: 'Comment not found' });
     }
+    if (comment.deletedAt) {
+      return res.status(400).json({ error: 'Cannot vote on deleted comments' });
+    }
+    const ticket = await HelpTicket.findById(comment.ticket).select('deletedAt');
+    if (ticket && ticket.deletedAt) {
+      return res.status(400).json({ error: 'Cannot vote on comments in deleted tickets' });
+    }
     
     console.log('Before - upvotes:', comment.upvotes, 'downvotes:', comment.downvotes);
     
@@ -204,4 +226,3 @@ exports.getCommentsForTicket = async (ticketId) => {
 };
 
 module.exports = exports;
-

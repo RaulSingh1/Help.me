@@ -104,6 +104,11 @@ nav a:hover {
     font-weight: bold;
 }
 
+.status-deleted {
+    color: #7f8c8d;
+    font-weight: bold;
+}
+
 /* Forms */
 .form-group {
     margin-bottom: 1rem;
@@ -198,12 +203,34 @@ tbody tr:hover {
     background: #f9f9f9;
 }
 
+.row-deleted {
+    background: #f7f7f7;
+}
+
+.row-deleted td {
+    color: #7a7a7a;
+}
+
 /* Ticket Detail */
 .ticket-detail {
     background: #fff;
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.ticket-deleted {
+    background: #f7f7f7;
+    border: 1px dashed #bcbcbc;
+}
+
+.deleted-note {
+    background: #efefef;
+    color: #555;
+    border-left: 4px solid #8d8d8d;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
 }
 
 .ticket-info {
@@ -421,6 +448,13 @@ tbody tr:hover {
     font-weight: 500;
 }
 
+.deleted-badge {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+    margin-left: 0.5rem;
+    font-weight: 500;
+}
+
 .comment-date {
     font-size: 0.85rem;
     color: #7f8c8d;
@@ -476,4 +510,3 @@ tbody tr:hover {
     text-align: center;
     color: #7f8c8d;
 }
-

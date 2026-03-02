@@ -10,11 +10,16 @@
     <%- include('../partials/nav') %>
 
     <div class="container">
+        <% const canSeeDeletedContent = user && user.isAdmin && showDeleted; %>
+
         <h1>Resolved Tickets</h1>
-        
+
         <div class="actions">
-            <a href="/tickets" class="btn">View Open Tickets</a>
-            <a href="/tickets/search" class="btn">Search Tickets</a>
+            <a href="/tickets<%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>" class="btn">View Open Tickets</a>
+            <a href="/tickets/search<%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>" class="btn">Search Tickets</a>
+            <% if (user && user.isAdmin) { %>
+                <a href="/tickets/resolved?showDeleted=<%= showDeleted ? '0' : '1' %>" class="btn btn-secondary"><%= showDeleted ? 'Skjul slettet' : 'Vis slettet' %></a>
+            <% } %>
         </div>
 
         <% if (tickets.length === 0) { %>
@@ -32,13 +37,15 @@
                 </thead>
                 <tbody>
                     <% tickets.forEach(ticket => { %>
-                        <tr>
-                            <td><%= ticket.title %></td>
-                            <td><%= ticket.priority %></td>
-                            <td><%= ticket.user ? ticket.user.username : 'Unknown' %></td>
-                            <td><%= ticket.resolvedAt ? ticket.resolvedAt.toLocaleDateString() : 'Unknown' %></td>
+                        <% const isDeletedTicket = Boolean(ticket.deletedAt); %>
+                        <% const hideDeletedContent = isDeletedTicket && !canSeeDeletedContent; %>
+                        <tr class="<%= isDeletedTicket ? 'row-deleted' : '' %>">
+                            <td><%= hideDeletedContent ? '[deleted ticket]' : ticket.title %></td>
+                            <td><%= hideDeletedContent ? '[deleted]' : ticket.priority %></td>
+                            <td><%= hideDeletedContent ? '[deleted]' : (ticket.user ? ticket.user.username : 'Unknown') %></td>
+                            <td><%= hideDeletedContent ? '[deleted]' : (ticket.resolvedAt ? ticket.resolvedAt.toLocaleDateString() : 'Unknown') %></td>
                             <td>
-                                <a href="/tickets/<%= ticket._id %>">View</a>
+                                <a href="/tickets/<%= ticket._id %><%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>">View</a>
                             </td>
                         </tr>
                     <% }); %>
@@ -48,4 +55,3 @@
     </div>
 </body>
 </html>
-

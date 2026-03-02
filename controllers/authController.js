@@ -97,8 +97,11 @@ exports.deleteUser = async (req, res) => {
       return res.redirect('/auth/login');
     }
     
-    // Delete all tickets created by this user
-    await HelpTicket.deleteMany({ user: req.session.userId });
+    // Soft delete all tickets created by this user
+    await HelpTicket.updateMany(
+      { user: req.session.userId, deletedAt: null },
+      { $set: { deletedAt: new Date(), deletedBy: req.session.userId } }
+    );
     
     // Delete the user
     await User.findByIdAndDelete(req.session.userId);
