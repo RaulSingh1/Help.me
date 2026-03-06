@@ -19,7 +19,7 @@ exports.show = async (req, res) => {
   try {
     const { showDeleted } = getShowDeletedState(req);
     const ticket = await HelpTicket.findById(req.params.id).populate('user', 'username');
-    if (!ticket) return res.status(404).send('Ticket not found');
+    if (!ticket) return res.status(404).send('Fant ikke saken');
     
     // Get comments for this ticket with populated upvotes/downvotes
     const comments = await require('../models/comment-model').find({ ticket: req.params.id })
@@ -66,12 +66,12 @@ exports.edit = async (req, res) => {
   }
   try {
     const ticket = await HelpTicket.findById(req.params.id);
-    if (!ticket) return res.status(404).send('Ticket not found');
-    if (ticket.deletedAt) return res.status(400).send('Deleted tickets cannot be edited');
+    if (!ticket) return res.status(404).send('Fant ikke saken');
+    if (ticket.deletedAt) return res.status(400).send('Slettede saker kan ikke redigeres');
     
     // Check if user owns this ticket
     if (ticket.user.toString() !== req.session.userId) {
-      return res.status(403).send('You can only edit your own tickets');
+      return res.status(403).send('Du kan bare redigere dine egne saker');
     }
     
     res.render('tickets/edit', { ticket });
@@ -86,12 +86,12 @@ exports.update = async (req, res) => {
   }
   try {
     const ticket = await HelpTicket.findById(req.params.id);
-    if (!ticket) return res.status(404).send('Ticket not found');
-    if (ticket.deletedAt) return res.status(400).send('Deleted tickets cannot be edited');
+    if (!ticket) return res.status(404).send('Fant ikke saken');
+    if (ticket.deletedAt) return res.status(400).send('Slettede saker kan ikke redigeres');
     
     // Check if user owns this ticket
     if (ticket.user.toString() !== req.session.userId) {
-      return res.status(403).send('You can only edit your own tickets');
+      return res.status(403).send('Du kan bare redigere dine egne saker');
     }
 
     const { title, description, priority, status } = req.body;
@@ -110,13 +110,13 @@ exports.delete = async (req, res) => {
   try {
     const { showDeleted } = getShowDeletedState(req);
     const ticket = await HelpTicket.findById(req.params.id);
-    if (!ticket) return res.status(404).send('Ticket not found');
+    if (!ticket) return res.status(404).send('Fant ikke saken');
     
     // Check if user owns this ticket or is admin
     const isOwner = ticket.user.toString() === req.session.userId;
     const isAdmin = Boolean(req.session.isAdmin);
     if (!isOwner && !isAdmin) {
-      return res.status(403).send('You are not authorized to delete this ticket');
+      return res.status(403).send('Du har ikke tilgang til å slette denne saken');
     }
 
     if (ticket.deletedAt) {
@@ -164,14 +164,14 @@ exports.search = async (req, res) => {
 // Resolve ticket (admin only)
 exports.resolve = async (req, res) => {
   if (!req.session.userId || !req.session.isAdmin) {
-    return res.status(403).send('Only admins can resolve tickets');
+    return res.status(403).send('Bare administratorer kan løse saker');
   }
   
   try {
     const { showDeleted } = getShowDeletedState(req);
     const ticket = await HelpTicket.findById(req.params.id);
-    if (!ticket) return res.status(404).send('Ticket not found');
-    if (ticket.deletedAt) return res.status(400).send('Deleted tickets cannot be resolved');
+    if (!ticket) return res.status(404).send('Fant ikke saken');
+    if (ticket.deletedAt) return res.status(400).send('Slettede saker kan ikke markeres som løst');
     
     // Update ticket to resolved
     ticket.status = 'resolved';

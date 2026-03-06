@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Ticket - Help Desk</title>
+    <title>Rediger sak - Hjelpesenter</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <%- include('../partials/nav') %>
 
     <div class="container">
-        <h1>Edit Ticket</h1>
+        <h1>Rediger sak</h1>
 
         <% if (typeof error !== 'undefined') { %>
             <div class="error-message">
@@ -20,41 +20,40 @@
 
         <form action="/tickets/<%= ticket._id %>?_method=PUT" method="POST" class="ticket-form">
             <div class="form-group">
-                <label for="title">Title:</label>
+                <label for="title">Tittel:</label>
                 <input type="text" id="title" name="title" value="<%= ticket.title %>" required>
             </div>
 
             <div class="form-group">
-                <label for="description">Description:</label>
+                <label for="description">Beskrivelse:</label>
                 <textarea id="description" name="description" required rows="6"><%= ticket.description %></textarea>
             </div>
 
             <div class="form-group">
-                <label for="priority">Priority:</label>
+                <label for="priority">Prioritet:</label>
                 <select id="priority" name="priority">
-                    <option value="low" <%= ticket.priority === 'low' ? 'selected' : '' %>>Low</option>
-                    <option value="medium" <%= ticket.priority === 'medium' ? 'selected' : '' %>>Medium</option>
-                    <option value="high" <%= ticket.priority === 'high' ? 'selected' : '' %>>High</option>
-                    <option value="urgent" <%= ticket.priority === 'urgent' ? 'selected' : '' %>>Urgent</option>
+                    <option value="low" <%= ticket.priority === 'low' ? 'selected' : '' %>>Lav</option>
+                    <option value="medium" <%= ticket.priority === 'medium' ? 'selected' : '' %>>Middels</option>
+                    <option value="high" <%= ticket.priority === 'high' ? 'selected' : '' %>>Høy</option>
+                    <option value="urgent" <%= ticket.priority === 'urgent' ? 'selected' : '' %>>Kritisk</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="status">Status:</label>
                 <select id="status" name="status">
-                    <option value="open" <%= ticket.status === 'open' ? 'selected' : '' %>>Open</option>
-                    <option value="in-progress" <%= ticket.status === 'in-progress' ? 'selected' : '' %>>In Progress</option>
-                    <option value="resolved" <%= ticket.status === 'resolved' ? 'selected' : '' %>>Resolved</option>
-                    <option value="closed" <%= ticket.status === 'closed' ? 'selected' : '' %>>Closed</option>
+                    <option value="open" <%= ticket.status === 'open' ? 'selected' : '' %>>Åpen</option>
+                    <option value="in-progress" <%= ticket.status === 'in-progress' ? 'selected' : '' %>>Under arbeid</option>
+                    <option value="resolved" <%= ticket.status === 'resolved' ? 'selected' : '' %>>Løst</option>
+                    <option value="closed" <%= ticket.status === 'closed' ? 'selected' : '' %>>Lukket</option>
                 </select>
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn">Update Ticket</button>
-                <a href="/tickets/<%= ticket._id %>" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn">Oppdater sak</button>
+                <a href="/tickets/<%= ticket._id %>" class="btn btn-secondary">Avbryt</a>
             </div>
         </form>
     </div>
 </body>
 </html>
-

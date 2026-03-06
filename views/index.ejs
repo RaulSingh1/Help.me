@@ -1,41 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Help Desk - Home</title>
+    <title>Hjelpesenter - Hjem</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <%- include('partials/nav') %>
 
     <div class="container">
-        <h1>Help Desk</h1>
+        <h1>Hjelpesenter</h1>
         
         <div class="ticket-stats">
             <div class="stat-card">
-                <h3>Open Tickets</h3>
+                <h3>Åpne saker</h3>
                 <p class="stat-number"><%= openTickets %></p>
             </div>
             <div class="stat-card">
-                <h3>In Progress</h3>
+                <h3>Under arbeid</h3>
                 <p class="stat-number"><%= inProgressTickets %></p>
             </div>
             <div class="stat-card">
-                <h3>Resolved</h3>
+                <h3>Løste saker</h3>
                 <p class="stat-number"><%= resolvedTickets %></p>
             </div>
             <div class="stat-card">
-                <h3>Total Tickets</h3>
+                <h3>Totalt antall saker</h3>
                 <p class="stat-number"><%= totalTickets %></p>
             </div>
         </div>
         
         <div class="actions">
-            <a href="/tickets/new" class="btn">Submit New Ticket</a>
-            <a href="/tickets" class="btn">View All Tickets</a>
+            <a href="/tickets/new" class="btn">Opprett ny sak</a>
+            <a href="/tickets" class="btn">Se alle saker</a>
         </div>
     </div>
 </body>
 </html>
-

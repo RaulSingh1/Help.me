@@ -14,7 +14,7 @@ exports.register = async (req, res) => {
     // Check if user already exists by username
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.render('auth/register', { error: 'User with this username already exists' });
+      return res.render('auth/register', { error: 'Brukernavn er allerede i bruk' });
     }
     
     const user = new User({ username, password });
@@ -43,12 +43,12 @@ exports.login = async (req, res) => {
     
     const user = await User.findOne({ username });
     if (!user) {
-      return res.render('auth/login', { error: 'Invalid username or password' });
+      return res.render('auth/login', { error: 'Ugyldig brukernavn eller passord' });
     }
     
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.render('auth/login', { error: 'Invalid username or password' });
+      return res.render('auth/login', { error: 'Ugyldig brukernavn eller passord' });
     }
     
     // Set session
