@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resolved Tickets - Help Desk</title>
+    <title>Løste saker - Hjelpesenter</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -11,28 +11,30 @@
 
     <div class="container">
         <% const canSeeDeletedContent = user && user.isAdmin && showDeleted; %>
+        <% const priorityLabels = { low: 'Lav', medium: 'Middels', high: 'Høy', urgent: 'Kritisk' }; %>
 
-        <h1>Resolved Tickets</h1>
+        <h1>Løste saker</h1>
 
         <div class="actions">
-            <a href="/tickets<%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>" class="btn">View Open Tickets</a>
-            <a href="/tickets/search<%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>" class="btn">Search Tickets</a>
+            <a href="/tickets<%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>" class="btn">Se åpne saker</a>
+            <a href="/tickets/search<%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>" class="btn">Søk i saker</a>
             <% if (user && user.isAdmin) { %>
                 <a href="/tickets/resolved?showDeleted=<%= showDeleted ? '0' : '1' %>" class="btn btn-secondary"><%= showDeleted ? 'Skjul slettet' : 'Vis slettet' %></a>
             <% } %>
         </div>
 
         <% if (tickets.length === 0) { %>
-            <p>No resolved tickets.</p>
+            <p>Ingen løste saker.</p>
         <% } else { %>
             <table>
                 <thead>
                     <tr>
-                        <th>Title</th>
-                        <th>Priority</th>
-                        <th>Created By</th>
-                        <th>Resolved Date</th>
-                        <th>Actions</th>
+                        <th>Tittel</th>
+                        <th>Prioritet</th>
+                        <th>Opprettet av</th>
+                        <th>Løst av</th>
+                        <th>Løst dato</th>
+                        <th>Handlinger</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,12 +42,13 @@
                         <% const isDeletedTicket = Boolean(ticket.deletedAt); %>
                         <% const hideDeletedContent = isDeletedTicket && !canSeeDeletedContent; %>
                         <tr class="<%= isDeletedTicket ? 'row-deleted' : '' %>">
-                            <td><%= hideDeletedContent ? '[deleted ticket]' : ticket.title %></td>
-                            <td><%= hideDeletedContent ? '[deleted]' : ticket.priority %></td>
-                            <td><%= hideDeletedContent ? '[deleted]' : (ticket.user ? ticket.user.username : 'Unknown') %></td>
-                            <td><%= hideDeletedContent ? '[deleted]' : (ticket.resolvedAt ? ticket.resolvedAt.toLocaleDateString() : 'Unknown') %></td>
+                            <td><%= hideDeletedContent ? '[slettet sak]' : ticket.title %></td>
+                            <td><%= hideDeletedContent ? '[slettet]' : (priorityLabels[ticket.priority] || ticket.priority) %></td>
+                            <td><%= hideDeletedContent ? '[slettet]' : (ticket.user ? ticket.user.username : 'Ukjent') %></td>
+                            <td><%= hideDeletedContent ? '[slettet]' : (ticket.resolvedBy ? ticket.resolvedBy.username : 'Ukjent') %></td>
+                            <td><%= hideDeletedContent ? '[slettet]' : (ticket.resolvedAt ? ticket.resolvedAt.toLocaleDateString('no-NO') : 'Ukjent') %></td>
                             <td>
-                                <a href="/tickets/<%= ticket._id %><%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>">View</a>
+                                <a href="/tickets/<%= ticket._id %><%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>">Vis</a>
                             </td>
                         </tr>
                     <% }); %>

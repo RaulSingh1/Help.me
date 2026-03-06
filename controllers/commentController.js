@@ -19,10 +19,10 @@ exports.addComment = async (req, res) => {
     // Check if ticket exists
     const ticket = await HelpTicket.findById(ticketId);
     if (!ticket) {
-      return res.status(404).send('Ticket not found');
+      return res.status(404).send('Fant ikke saken');
     }
     if (ticket.deletedAt) {
-      return res.status(403).send('Cannot add comments to a deleted ticket');
+      return res.status(403).send('Kan ikke legge til kommentarer på en slettet sak');
     }
     
     // Create comment
@@ -58,7 +58,7 @@ exports.deleteComment = async (req, res) => {
     
     const comment = await Comment.findById(commentId);
     if (!comment) {
-      return res.status(404).send('Comment not found');
+      return res.status(404).send('Fant ikke kommentaren');
     }
     
     // Check if user is the author or admin
@@ -66,7 +66,7 @@ exports.deleteComment = async (req, res) => {
     const isAdmin = req.session.isAdmin;
     
     if (!isAuthor && !isAdmin) {
-      return res.status(403).send('You are not authorized to delete this comment');
+      return res.status(403).send('Du har ikke tilgang til å slette denne kommentaren');
     }
     
     // Soft delete - set deletedAt timestamp
@@ -89,7 +89,7 @@ exports.upvoteComment = async (req, res) => {
   
   if (!req.session.userId) {
     console.log('User not logged in - returning 401');
-    return res.status(401).json({ error: 'You must be logged in to vote' });
+    return res.status(401).json({ error: 'Du må være logget inn for å stemme' });
   }
   
   try {
@@ -100,14 +100,14 @@ exports.upvoteComment = async (req, res) => {
     
     const comment = await Comment.findById(commentId);
     if (!comment) {
-      return res.status(404).json({ error: 'Comment not found' });
+      return res.status(404).json({ error: 'Fant ikke kommentaren' });
     }
     if (comment.deletedAt) {
-      return res.status(400).json({ error: 'Cannot vote on deleted comments' });
+      return res.status(400).json({ error: 'Kan ikke stemme på slettede kommentarer' });
     }
     const ticket = await HelpTicket.findById(comment.ticket).select('deletedAt');
     if (ticket && ticket.deletedAt) {
-      return res.status(400).json({ error: 'Cannot vote on comments in deleted tickets' });
+      return res.status(400).json({ error: 'Kan ikke stemme på kommentarer i slettede saker' });
     }
     
     console.log('Before - upvotes:', comment.upvotes, 'downvotes:', comment.downvotes);
@@ -155,7 +155,7 @@ exports.upvoteComment = async (req, res) => {
 // Downvote a comment
 exports.downvoteComment = async (req, res) => {
   if (!req.session.userId) {
-    return res.status(401).json({ error: 'You must be logged in to vote' });
+    return res.status(401).json({ error: 'Du må være logget inn for å stemme' });
   }
   
   try {
@@ -166,14 +166,14 @@ exports.downvoteComment = async (req, res) => {
     
     const comment = await Comment.findById(commentId);
     if (!comment) {
-      return res.status(404).json({ error: 'Comment not found' });
+      return res.status(404).json({ error: 'Fant ikke kommentaren' });
     }
     if (comment.deletedAt) {
-      return res.status(400).json({ error: 'Cannot vote on deleted comments' });
+      return res.status(400).json({ error: 'Kan ikke stemme på slettede kommentarer' });
     }
     const ticket = await HelpTicket.findById(comment.ticket).select('deletedAt');
     if (ticket && ticket.deletedAt) {
-      return res.status(400).json({ error: 'Cannot vote on comments in deleted tickets' });
+      return res.status(400).json({ error: 'Kan ikke stemme på kommentarer i slettede saker' });
     }
     
     console.log('Before - upvotes:', comment.upvotes, 'downvotes:', comment.downvotes);

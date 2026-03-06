@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Tickets - Help Desk</title>
+    <title>Søk i saker - Hjelpesenter</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -11,20 +11,22 @@
 
     <div class="container">
         <% const canSeeDeletedContent = user && user.isAdmin && showDeleted; %>
+        <% const statusLabels = { open: 'Åpen', 'in-progress': 'Under arbeid', resolved: 'Løst', closed: 'Lukket' }; %>
+        <% const priorityLabels = { low: 'Lav', medium: 'Middels', high: 'Høy', urgent: 'Kritisk' }; %>
 
-        <h1>Search Tickets</h1>
+        <h1>Søk i saker</h1>
 
         <form action="/tickets/search" method="GET" class="search-form">
             <div class="form-group">
-                <label for="q">Search by title, description, or creator:</label>
-                <input type="text" id="q" name="q" value="<%= typeof query !== 'undefined' ? query : '' %>" placeholder="Enter search term..." required>
+                <label for="q">Søk etter tittel, beskrivelse eller oppretter:</label>
+                <input type="text" id="q" name="q" value="<%= typeof query !== 'undefined' ? query : '' %>" placeholder="Skriv inn søkeord..." required>
                 <% if (user && user.isAdmin) { %>
                     <input type="hidden" name="showDeleted" value="<%= showDeleted ? '1' : '0' %>">
                 <% } %>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn">Search</button>
-                <a href="/tickets<%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>" class="btn btn-secondary">View All Tickets</a>
+                <button type="submit" class="btn">Søk</button>
+                <a href="/tickets<%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>" class="btn btn-secondary">Se alle saker</a>
                 <% if (user && user.isAdmin) { %>
                     <a href="/tickets/search<%= typeof query !== 'undefined' ? ('?q=' + encodeURIComponent(query) + '&') : '?' %>showDeleted=<%= showDeleted ? '0' : '1' %>" class="btn btn-secondary"><%= showDeleted ? 'Skjul slettet' : 'Vis slettet' %></a>
                 <% } %>
@@ -32,21 +34,21 @@
         </form>
 
         <% if (typeof query !== 'undefined') { %>
-            <h2>Results for: "<%= query %>"</h2>
+            <h2>Resultater for: "<%= query %>"</h2>
 
             <% if (tickets.length === 0) { %>
-                <p>No tickets found matching your search. Try a different term.</p>
+                <p>Ingen saker matchet søket ditt. Prøv et annet søkeord.</p>
             <% } else { %>
-                <p>Found <%= tickets.length %> ticket(s):</p>
+                <p>Fant <%= tickets.length %> sak(er):</p>
 
                 <table>
                     <thead>
                         <tr>
-                            <th>Title</th>
-                            <th>Priority</th>
+                            <th>Tittel</th>
+                            <th>Prioritet</th>
                             <th>Status</th>
-                            <th>Created By</th>
-                            <th>Actions</th>
+                            <th>Opprettet av</th>
+                            <th>Handlinger</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -54,11 +56,11 @@
                             <% const isDeletedTicket = Boolean(ticket.deletedAt); %>
                             <% const hideDeletedContent = isDeletedTicket && !canSeeDeletedContent; %>
                             <tr class="<%= isDeletedTicket ? 'row-deleted' : '' %>">
-                                <td><%= hideDeletedContent ? '[deleted ticket]' : ticket.title %></td>
-                                <td><%= hideDeletedContent ? '[deleted]' : ticket.priority %></td>
-                                <td><%= isDeletedTicket ? 'deleted' : ticket.status %></td>
-                                <td><%= hideDeletedContent ? '[deleted]' : (ticket.user ? ticket.user.username : 'Unknown') %></td>
-                                <td><a href="/tickets/<%= ticket._id %><%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>">View</a></td>
+                                <td><%= hideDeletedContent ? '[slettet sak]' : ticket.title %></td>
+                                <td><%= hideDeletedContent ? '[slettet]' : (priorityLabels[ticket.priority] || ticket.priority) %></td>
+                                <td><%= isDeletedTicket ? 'Slettet' : (statusLabels[ticket.status] || ticket.status) %></td>
+                                <td><%= hideDeletedContent ? '[slettet]' : (ticket.user ? ticket.user.username : 'Ukjent') %></td>
+                                <td><a href="/tickets/<%= ticket._id %><%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>">Vis</a></td>
                             </tr>
                         <% }); %>
                     </tbody>
