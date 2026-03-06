@@ -13,6 +13,7 @@
         <% const canSeeDeletedContent = user && user.isAdmin && showDeleted; %>
         <% const statusLabels = { open: 'Åpen', 'in-progress': 'Under arbeid', resolved: 'Løst', closed: 'Lukket' }; %>
         <% const priorityLabels = { low: 'Lav', medium: 'Middels', high: 'Høy', urgent: 'Kritisk' }; %>
+        <% const isTicketOwner = user && ticket.user && ticket.user._id.toString() === user._id.toString(); %>
 
         <h1>Saksdetaljer</h1>
 
@@ -42,7 +43,7 @@
                 <p><strong>Opprettet av:</strong> <%= ticket.deletedAt && !canSeeDeletedContent ? '[slettet]' : (ticket.user ? ticket.user.username : 'Ukjent') %></p>
                 <p><strong>Opprettet dato:</strong> <%= ticket.deletedAt && !canSeeDeletedContent ? '[slettet]' : (ticket.dateCreated ? ticket.dateCreated.toLocaleDateString('no-NO') : 'Ukjent') %></p>
                 <% if (ticket.resolvedBy && (!ticket.deletedAt || canSeeDeletedContent)) { %>
-                    <p><strong>Løst av:</strong> Admin</p>
+                    <p><strong>Løst av:</strong> <%= ticket.resolvedBy.username %></p>
                     <p><strong>Løst dato:</strong> <%= ticket.resolvedAt ? ticket.resolvedAt.toLocaleDateString('no-NO') : 'Ukjent' %></p>
                 <% } %>
             </div>
@@ -68,12 +69,27 @@
                         <button type="submit" class="btn btn-success" onclick="return confirm('Er du sikker på at du vil markere denne saken som løst?')">Marker som løst</button>
                     </form>
                 <% } %>
+                <% if (isTicketOwner && !ticket.deletedAt && ticket.status === 'resolved') { %>
+                    <form action="/tickets/<%= ticket._id %>/reject-solution<%= showDeleted ? '?showDeleted=1' : '' %>" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-secondary" onclick="return confirm('Vil du sette saken tilbake til under arbeid?')">Løsning ikke god nok</button>
+                    </form>
+                <% } %>
             </div>
         </div>
 
         <!-- Kommentarfelt -->
         <div class="comments-section">
             <h3>Kommentarer (<%= comments.length %>)</h3>
+            <% if (ticket.acceptedSolutionComment) { %>
+                <% const acceptedIsDeleted = Boolean(ticket.acceptedSolutionComment.deletedAt); %>
+                <% const hideAccepted = acceptedIsDeleted && !canSeeDeletedContent; %>
+                <div class="accepted-solution-card">
+                    <h4>Godkjent løsning</h4>
+                    <p><strong>Fra:</strong> <%= hideAccepted ? '[slettet]' : (ticket.acceptedSolutionComment.user ? ticket.acceptedSolutionComment.user.username : 'Ukjent') %></p>
+                    <p><strong>Godkjent:</strong> <%= ticket.acceptedSolutionAt ? ticket.acceptedSolutionAt.toLocaleDateString('no-NO') : 'Ukjent' %></p>
+                    <p><%= hideAccepted ? '[slettet]' : ticket.acceptedSolutionComment.text %></p>
+                </div>
+            <% } %>
 
             <% if (comments.length === 0) { %>
                 <p class="no-comments">Ingen kommentarer ennå. Bli den første som kommenterer.</p>
@@ -85,6 +101,7 @@
                         const score = upvoteCount - downvoteCount;
                         const isDeletedComment = Boolean(comment.deletedAt);
                         const revealDeletedComment = isDeletedComment && canSeeDeletedContent;
+                        const isAcceptedSolution = ticket.acceptedSolutionComment && ticket.acceptedSolutionComment._id.toString() === comment._id.toString();
 
                         let hasUpvoted = false;
                         let hasDownvoted = false;
@@ -95,7 +112,7 @@
                             hasDownvoted = comment.downvotes.some(id => (typeof id === 'object' ? id._id : id).toString() === user._id.toString());
                         }
                     %>
-                        <div class="comment <%= isDeletedComment ? 'comment-deleted' : '' %>" id="comment-<%= comment._id %>">
+                        <div class="comment <%= isDeletedComment ? 'comment-deleted' : '' %> <%= isAcceptedSolution ? 'solution-highlight' : '' %>" id="comment-<%= comment._id %>">
                             <div class="comment-voting">
                                 <button type="button" class="vote-btn upvote <%= hasUpvoted ? 'active' : '' %>"
                                     onclick="vote('<%= comment._id %>', 'up')"
@@ -117,6 +134,9 @@
                                         <% if (revealDeletedComment) { %>
                                             <span class="deleted-badge">(slettet)</span>
                                         <% } %>
+                                        <% if (isAcceptedSolution) { %>
+                                            <span class="accepted-badge">(Godkjent løsning)</span>
+                                        <% } %>
                                     </span>
                                     <span class="comment-date">
                                         <%= comment.createdAt ? comment.createdAt.toLocaleDateString('no-NO') + ' ' + comment.createdAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ukjent' %>
@@ -132,6 +152,15 @@
                                                 <input type="hidden" name="showDeleted" value="<%= showDeleted ? '1' : '0' %>">
                                             <% } %>
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Er du sikker på at du vil slette denne kommentaren?')">Slett</button>
+                                        </form>
+                                    </div>
+                                <% } %>
+                                <% if (isTicketOwner && !ticket.deletedAt && ticket.status === 'resolved' && !isDeletedComment) { %>
+                                    <div class="comment-actions">
+                                        <form action="/tickets/<%= ticket._id %>/approve-solution/<%= comment._id %><%= showDeleted ? '?showDeleted=1' : '' %>" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-success" <%= isAcceptedSolution ? 'disabled' : '' %>>
+                                                <%= isAcceptedSolution ? 'Godkjent løsning' : 'Godkjenn som løsning' %>
+                                            </button>
                                         </form>
                                     </div>
                                 <% } %>

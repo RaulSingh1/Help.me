@@ -470,6 +470,13 @@ tbody tr:hover {
     font-weight: 500;
 }
 
+.accepted-badge {
+    font-size: 0.75rem;
+    color: #1d7f4f;
+    margin-left: 0.5rem;
+    font-weight: 700;
+}
+
 .comment-date {
     font-size: 0.85rem;
     color: #7f8c8d;
@@ -489,6 +496,28 @@ tbody tr:hover {
 .comment-deleted .comment-text {
     color: #999;
     font-style: italic;
+}
+
+.solution-highlight {
+    border-color: #8fd3af;
+    background: #f4fbf7;
+}
+
+.accepted-solution-card {
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    border-left: 5px solid #27ae60;
+    background: #f3fbf6;
+    border-radius: 6px;
+}
+
+.accepted-solution-card h4 {
+    margin: 0 0 0.5rem 0;
+    color: #1e7a4c;
+}
+
+.accepted-solution-card p {
+    margin: 0.3rem 0;
 }
 
 .comment-actions {

@@ -17,6 +17,8 @@ const helpTicketSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   resolvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   resolvedAt: { type: Date, default: null },
+  acceptedSolutionComment: { type: mongoose.Schema.Types.ObjectId, ref: 'Comment', default: null },
+  acceptedSolutionAt: { type: Date, default: null },
   deletedAt: { type: Date, default: null },
   deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null }
 }, { collection: 'help_tickets' });

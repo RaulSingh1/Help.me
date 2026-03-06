@@ -12,6 +12,7 @@ router.get('/:id/edit', ticketController.edit);
 router.put('/:id', ticketController.update);
 router.delete('/:id', ticketController.delete);
 router.post('/:id/resolve', ticketController.resolve);
+router.post('/:id/approve-solution/:commentId', ticketController.approveSolution);
+router.post('/:id/reject-solution', ticketController.rejectSolution);
 
 module.exports = router;
-

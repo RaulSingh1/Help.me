@@ -1,4 +1,5 @@
 const HelpTicket = require('../models/help-ticket-model');
+const Comment = require('../models/comment-model');
 
 const getShowDeletedState = (req) => {
   const showDeleted = Boolean(req.session && req.session.isAdmin && req.query.showDeleted === '1');
@@ -18,7 +19,13 @@ exports.index = async (req, res) => {
 exports.show = async (req, res) => {
   try {
     const { showDeleted } = getShowDeletedState(req);
-    const ticket = await HelpTicket.findById(req.params.id).populate('user', 'username');
+    const ticket = await HelpTicket.findById(req.params.id)
+      .populate('user', 'username')
+      .populate('resolvedBy', 'username')
+      .populate({
+        path: 'acceptedSolutionComment',
+        populate: { path: 'user', select: 'username isAdmin' }
+      });
     if (!ticket) return res.status(404).send('Fant ikke saken');
     
     // Get comments for this ticket with populated upvotes/downvotes
@@ -27,6 +34,16 @@ exports.show = async (req, res) => {
       .populate('upvotes', 'username')
       .populate('downvotes', 'username')
       .sort({ createdAt: -1 });
+
+    // Move accepted solution to top while keeping the rest sorted by newest first.
+    if (ticket.acceptedSolutionComment) {
+      const acceptedId = ticket.acceptedSolutionComment._id.toString();
+      comments.sort((a, b) => {
+        if (a._id.toString() === acceptedId) return -1;
+        if (b._id.toString() === acceptedId) return 1;
+        return b.createdAt - a.createdAt;
+      });
+    }
     
     res.render('tickets/show', { ticket, comments, showDeleted });
   } catch (error) {
@@ -177,6 +194,8 @@ exports.resolve = async (req, res) => {
     ticket.status = 'resolved';
     ticket.resolvedBy = req.session.userId;
     ticket.resolvedAt = new Date();
+    ticket.acceptedSolutionComment = null;
+    ticket.acceptedSolutionAt = null;
     
     await ticket.save();
     res.redirect(`/tickets${showDeleted ? '?showDeleted=1' : ''}`);
@@ -189,8 +208,78 @@ exports.resolve = async (req, res) => {
 exports.resolved = async (req, res) => {
   try {
     const { showDeleted } = getShowDeletedState(req);
-    const tickets = await HelpTicket.find({ status: { $in: ['resolved', 'closed'] } }).populate('user', 'username');
+    const tickets = await HelpTicket.find({ status: { $in: ['resolved', 'closed'] } })
+      .populate('user', 'username')
+      .populate('resolvedBy', 'username');
     res.render('tickets/resolved', { tickets, showDeleted });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+exports.approveSolution = async (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/auth/login');
+  }
+
+  try {
+    const { showDeleted } = getShowDeletedState(req);
+    const ticket = await HelpTicket.findById(req.params.id);
+    if (!ticket) return res.status(404).send('Fant ikke saken');
+    if (ticket.deletedAt) return res.status(400).send('Slettede saker kan ikke godkjennes');
+
+    if (ticket.user.toString() !== req.session.userId) {
+      return res.status(403).send('Kun saksforfatter kan godkjenne løsning');
+    }
+
+    if (ticket.status !== 'resolved') {
+      return res.status(400).send('Saken må være markert som løst før løsning kan godkjennes');
+    }
+
+    const comment = await Comment.findOne({
+      _id: req.params.commentId,
+      ticket: ticket._id,
+      deletedAt: null
+    });
+    if (!comment) return res.status(404).send('Fant ikke kommentaren');
+
+    ticket.acceptedSolutionComment = comment._id;
+    ticket.acceptedSolutionAt = new Date();
+    await ticket.save();
+
+    res.redirect(`/tickets/${ticket._id}${showDeleted ? '?showDeleted=1' : ''}`);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+exports.rejectSolution = async (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/auth/login');
+  }
+
+  try {
+    const { showDeleted } = getShowDeletedState(req);
+    const ticket = await HelpTicket.findById(req.params.id);
+    if (!ticket) return res.status(404).send('Fant ikke saken');
+    if (ticket.deletedAt) return res.status(400).send('Slettede saker kan ikke settes tilbake til under arbeid');
+
+    if (ticket.user.toString() !== req.session.userId) {
+      return res.status(403).send('Kun saksforfatter kan avvise løsning');
+    }
+
+    if (ticket.status !== 'resolved') {
+      return res.status(400).send('Kun løste saker kan settes tilbake til under arbeid');
+    }
+
+    ticket.status = 'in-progress';
+    ticket.resolvedBy = null;
+    ticket.resolvedAt = null;
+    ticket.acceptedSolutionComment = null;
+    ticket.acceptedSolutionAt = null;
+    await ticket.save();
+
+    res.redirect(`/tickets/${ticket._id}${showDeleted ? '?showDeleted=1' : ''}`);
   } catch (error) {
     res.status(500).send(error.message);
   }

@@ -32,6 +32,7 @@
                         <th>Tittel</th>
                         <th>Prioritet</th>
                         <th>Opprettet av</th>
+                        <th>Løst av</th>
                         <th>Løst dato</th>
                         <th>Handlinger</th>
                     </tr>
@@ -44,6 +45,7 @@
                             <td><%= hideDeletedContent ? '[slettet sak]' : ticket.title %></td>
                             <td><%= hideDeletedContent ? '[slettet]' : (priorityLabels[ticket.priority] || ticket.priority) %></td>
                             <td><%= hideDeletedContent ? '[slettet]' : (ticket.user ? ticket.user.username : 'Ukjent') %></td>
+                            <td><%= hideDeletedContent ? '[slettet]' : (ticket.resolvedBy ? ticket.resolvedBy.username : 'Ukjent') %></td>
                             <td><%= hideDeletedContent ? '[slettet]' : (ticket.resolvedAt ? ticket.resolvedAt.toLocaleDateString('no-NO') : 'Ukjent') %></td>
                             <td>
                                 <a href="/tickets/<%= ticket._id %><%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>">Vis</a>
