@@ -6,9 +6,9 @@
         <a href="/tickets/new">Ny sak</a>
         <a href="/auth/user">Min profil</a>
         <a href="/auth/logout">Logg ut</a>
+        <span class="nav-role"><%= user.isAdmin ? 'Admin' : 'Elev' %></span>
     <% } else { %>
         <a href="/auth/login">Logg inn</a>
         <a href="/auth/register">Registrer</a>
     <% } %>
 </nav>
-

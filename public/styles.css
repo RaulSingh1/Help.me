@@ -31,6 +31,7 @@ nav {
     background: #2c3e50;
     padding: 1rem 2rem;
     display: flex;
+    align-items: center;
     gap: 1.5rem;
     flex-wrap: wrap;
 }
@@ -46,6 +47,14 @@ nav a {
 nav a:hover {
     background: #34495e;
     text-decoration: none;
+}
+
+.nav-role {
+    margin-left: auto;
+    color: #cbd8e6;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 /* Container */
@@ -298,6 +307,12 @@ tbody tr:hover {
     nav {
         padding: 1rem;
         justify-content: center;
+    }
+
+    .nav-role {
+        width: 100%;
+        margin-left: 0;
+        text-align: right;
     }
     
     .container {
