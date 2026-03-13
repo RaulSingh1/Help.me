@@ -178,10 +178,10 @@ exports.search = async (req, res) => {
   }
 };
 
-// Resolve ticket (admin only)
+// Resolve ticket (any logged-in user)
 exports.resolve = async (req, res) => {
-  if (!req.session.userId || !req.session.isAdmin) {
-    return res.status(403).send('Bare administratorer kan løse saker');
+  if (!req.session.userId) {
+    return res.status(403).send('Du må være logget inn for å markere saken som løst');
   }
   
   try {
