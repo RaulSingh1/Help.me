@@ -19,13 +19,15 @@
                 <p><strong>Antall saker opprettet:</strong> <%= ticketCount %></p>
                 <p><strong>Bli med:</strong> <%= user.createdAt ? user.createdAt.toLocaleDateString('no-NO') : 'Ukjent' %></p>
             </div>
-        
-        <div class="danger-zone">
-            <h3>Fare-sone</h3>
-            <p>Advarsel: Denne handlingen kan ikke angres.</p>
-            <form action="/auth/user/delete" method="POST" onsubmit="return confirm('Er du sikker på at du vil slette kontoen din? Alle dine saker vil også bli slettet.');">
-                <button type="submit" class="btn btn-danger">Slett konto</button>
-            </form>
+
+            <div class="danger-zone">
+                <h3>Fare-sone</h3>
+                <p>Advarsel: Denne handlingen kan ikke angres.</p>
+                <form action="/auth/user/delete" method="POST" onsubmit="return confirm('Er du sikker på at du vil slette kontoen din? Alle dine saker vil også bli slettet.');">
+                    <button type="submit" class="btn btn-danger">Slett konto</button>
+                </form>
+            </div>
         </div>
+    </div>
 </body>
 </html>

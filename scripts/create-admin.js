@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user-model');
 
-const MONGODB_URI = 'mongodb://10.12.19.181:27017/helpdesk';
+const MONGODB_URI = 'mongodb://10.12.19.21:27017/helpdesk';
 
 async function createAdmin() {
   try {

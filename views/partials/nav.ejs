@@ -1,14 +1,56 @@
-<nav>
-    <a href="/">Hjem</a>
-    <a href="/tickets">Saker</a>
-    <a href="/tickets/resolved">Løste saker</a>
-    <% if (user) { %>
-        <a href="/tickets/new">Ny sak</a>
-        <a href="/auth/user">Min profil</a>
-        <a href="/auth/logout">Logg ut</a>
-        <span class="nav-role"><%= user.isAdmin ? 'Admin' : 'Elev' %></span>
-    <% } else { %>
-        <a href="/auth/login">Logg inn</a>
-        <a href="/auth/register">Registrer</a>
-    <% } %>
+<nav class="site-nav" id="site-nav">
+    <div class="nav-mobile-head">
+        <div class="nav-quick-links">
+            <a href="/">Hjem</a>
+            <a href="/tickets">Saker</a>
+            <a href="/tickets/resolved">Løste</a>
+        </div>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">Mer</button>
+    </div>
+    <div class="nav-links" id="nav-links">
+        <% if (user) { %>
+            <a href="/tickets/new">Ny sak</a>
+            <a href="/auth/user">Min profil</a>
+            <a href="/auth/logout">Logg ut</a>
+            <span class="nav-role"><%= user.isAdmin ? 'Admin' : 'Elev' %></span>
+        <% } else { %>
+            <a href="/auth/login">Logg inn</a>
+            <a href="/auth/register">Registrer</a>
+        <% } %>
+    </div>
 </nav>
+<script>
+    (function () {
+        const nav = document.getElementById('site-nav');
+        const toggleBtn = document.querySelector('.nav-toggle');
+        const links = document.getElementById('nav-links');
+
+        if (!nav || !toggleBtn || !links) {
+            return;
+        }
+
+        nav.classList.add('js-enabled');
+
+        const closeMenu = function () {
+            links.classList.remove('is-open');
+            nav.classList.remove('menu-open');
+            toggleBtn.setAttribute('aria-expanded', 'false');
+        };
+
+        toggleBtn.addEventListener('click', function () {
+            const isOpen = links.classList.toggle('is-open');
+            nav.classList.toggle('menu-open', isOpen);
+            toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!nav.contains(event.target)) {
+                closeMenu();
+            }
+        });
+
+        links.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', closeMenu);
+        });
+    })();
+</script>

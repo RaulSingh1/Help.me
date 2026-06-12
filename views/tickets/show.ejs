@@ -30,7 +30,13 @@
             <% } %>
 
             <div class="ticket-info">
-                <p><strong>Prioritet:</strong> <%= ticket.deletedAt && !canSeeDeletedContent ? '[slettet]' : (priorityLabels[ticket.priority] || ticket.priority) %></p>
+                <p><strong>Prioritet:</strong>
+                    <% if (ticket.deletedAt && !canSeeDeletedContent) { %>
+                        [slettet]
+                    <% } else { %>
+                        <span class="priority-badge priority-<%= ticket.priority %>"><%= priorityLabels[ticket.priority] || ticket.priority %></span>
+                    <% } %>
+                </p>
                 <p><strong>Status:</strong>
                     <% if (ticket.deletedAt) { %>
                         <span class="status-deleted">Slettet</span>
@@ -64,7 +70,7 @@
                         <button type="submit" class="btn btn-danger" onclick="return confirm('Er du sikker på at du vil slette denne saken?')">Slett</button>
                     </form>
                 <% } %>
-                <% if (user && !ticket.deletedAt && user.isAdmin && ticket.status !== 'resolved') { %>
+                <% if (user && !ticket.deletedAt && ticket.status !== 'resolved') { %>
                     <form action="/tickets/<%= ticket._id %>/resolve<%= showDeleted ? '?showDeleted=1' : '' %>" method="POST" style="display: inline;">
                         <button type="submit" class="btn btn-success" onclick="return confirm('Er du sikker på at du vil markere denne saken som løst?')">Marker som løst</button>
                     </form>

@@ -55,12 +55,18 @@
                         <% tickets.forEach(ticket => { %>
                             <% const isDeletedTicket = Boolean(ticket.deletedAt); %>
                             <% const hideDeletedContent = isDeletedTicket && !canSeeDeletedContent; %>
+                            <% const preview = hideDeletedContent || !ticket.description ? '' : (ticket.description.length > 180 ? ticket.description.slice(0, 180) + '…' : ticket.description); %>
                             <tr class="<%= isDeletedTicket ? 'row-deleted' : '' %>">
-                                <td><%= hideDeletedContent ? '[slettet sak]' : ticket.title %></td>
-                                <td><%= hideDeletedContent ? '[slettet]' : (priorityLabels[ticket.priority] || ticket.priority) %></td>
-                                <td><%= isDeletedTicket ? 'Slettet' : (statusLabels[ticket.status] || ticket.status) %></td>
-                                <td><%= hideDeletedContent ? '[slettet]' : (ticket.user ? ticket.user.username : 'Ukjent') %></td>
-                                <td><a href="/tickets/<%= ticket._id %><%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>">Vis</a></td>
+                                <td data-label="Tittel" class="cell-primary">
+                                    <span class="ticket-title"><%= hideDeletedContent ? '[slettet sak]' : ticket.title %></span>
+                                    <% if (preview) { %>
+                                        <p class="ticket-preview"><%= preview %></p>
+                                    <% } %>
+                                </td>
+                                <td data-label="Prioritet" class="cell-meta priority-chip <%= hideDeletedContent ? '' : ('priority-' + ticket.priority) %>"><%= hideDeletedContent ? '[slettet]' : (priorityLabels[ticket.priority] || ticket.priority) %></td>
+                                <td data-label="Status" class="cell-meta"><%= isDeletedTicket ? 'Slettet' : (statusLabels[ticket.status] || ticket.status) %></td>
+                                <td data-label="Opprettet av" class="cell-meta"><%= hideDeletedContent ? '[slettet]' : (ticket.user ? ticket.user.username : 'Ukjent') %></td>
+                                <td data-label="Handlinger" class="cell-action"><a href="/tickets/<%= ticket._id %><%= user && user.isAdmin && showDeleted ? '?showDeleted=1' : '' %>">Vis</a></td>
                             </tr>
                         <% }); %>
                     </tbody>
